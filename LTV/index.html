@@ -1,0 +1,891 @@
+<!--
+//
+//index.php v.2015 (c) LuzEnTuVida.net (c) jumanja.net
+//
+function fecha($dow){
+	$mes = date("n");
+	$mesArray = array(
+		1 => "Enero", 		2 => "Febrero", 		3 => "Marzo", 		4 => "Abril", 		5 => "Mayo", 		6 => "Junio", 
+		7 => "Julio", 		8 => "Agosto", 		9 => "Septiembre", 		10 => "Octubre", 		11 => "Noviembre", 		12 => "Diciembre"
+	);
+
+	$semana = date("D");
+	$semanaArray = array(
+		"Mon" => "Lunes", 		"Tue" => "Martes", 		"Wed" => "Miercoles", 		"Thu" => "Jueves", 		"Fri" => "Viernes", 
+		"Sat" => "Sábado", 		"Sun" => "Domingo", 
+	);
+	
+	$mesReturn = $mesArray[$mes];
+	$semanaReturn = $semanaArray[$semana];
+	$dia = date("d");
+	$anio = date ("Y");
+	
+	if ($dow == true) {
+		return $semana;
+	} else {
+		return $semanaReturn." ".$dia." de ".$mesReturn." de ".$anio;
+	}
+}
+
+  //Conectar a la BD
+  include 'conectarbd.php';
+       
+    $params = "libros:titulo:libro";
+        
+	//LEER DE UNA TABLA
+	//$leertab = split(':', $params);
+	$leertab = explode(':', $params);
+	   
+	$lasopciones = '<option value=""></option>';
+	$sqlsel = "select " . $leertab[1] . ", " . $leertab[2] .
+		      " from " . $leertab[0] . 
+			  " where estadoreg= 'A' " .
+			   (isset($leertab[3]) ? " and " . $leertab[3] : "" ) .
+				   " order by " .
+				   $leertab[1];
+//print($sqlsel . "\n");
+//$row1[1] . '" >' .
+	   $res1 = mysql_query($sqlsel) or die(mysql_error());
+		while($row1 = mysql_fetch_array($res1)) {
+		  $lasopciones = $lasopciones . '<option value="' . 
+		  ($row1[0] <> $row1[1] ? $row1[0] . ' (' . $row1[1] . ')' : $row1[0] ) . '" >' .
+		  ($row1[0] <> $row1[1] ? $row1[0] . ' (' . $row1[1] . ')' : $row1[0] ) . '</option>';
+			   
+		}
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LuzEnTuVida.net - jumanja.net</title>
+    <!--<link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="_assets/css/jqm-demos.css">
+	  <link rel="shortcut icon" href="favicon.ico">
+	  -->
+    
+    <link rel="stylesheet" href="_assets/css/jqm-demos.css">
+	  <link rel="stylesheet" href="themes/jumanja.min.css" />
+    <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+    <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />-->
+    <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" />
+    <!--<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <!--<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>-->
+    <script src="js/jquery.mobile-1.4.5.min.js"></script>
+    <script src="js/sqlfunctions.js"></script>
+    <script src="js/dbfunctions.js"></script>
+    <script src="js/datefunctions.js"></script>
+    <script src="js/generar.js"></script>
+
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+	<script src="js/jquery.js"></script>
+
+
+    <!--<script src="_assets/js/index.js"></script>-->
+    <!-- luego de cambiar el theme <script src="js/jquery.mobile-1.4.5.min.js"></script>-->
+    
+	<script src="assets/cool-share/plugin.js"></script>
+	<script src="assets/js/demo.js"></script>
+	
+    		<!-- Plugin styles -->
+		<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
+		<link href="assets/cool-share/plugin.css" media="all" rel="stylesheet" />
+
+		<!-- Demo page styles -->
+		<link href="assets/css/styles.css" rel="stylesheet" />
+
+</head>
+
+<body onload="lectHoy()">
+       
+       
+   
+<div data-role="page" data-theme="d" class="jqm-demos" id="panel-fixed-page1" data-title="LuzEnTuVida.net">
+       <div id="divleft" style="float:left;height:2000px;width:30px">&nbsp;</div>
+       <div id="divright" style="float:right;height:2000px;width:30px">&nbsp;</div>
+
+    	  
+    <div data-theme="a" data-role="header" data-position="fixed">
+        <!--<h1>LuzEnTuVida.net</h1>-->
+        <nav style="text-align:center">
+                    <a href="#nav-panel">Buscador</a>&nbsp;&nbsp;
+                    <a href="#oraciones-panel">Oraciones</a>&nbsp;&nbsp;
+                    <a href="#listas-panel">Listas</a>&nbsp;&nbsp;
+                    <a href="#contacto-panel">Contacto</a>
+                    
+        </nav>
+        <a href="#nav-panel" data-icon="search" title="Buscar" data-iconpos="notext">Buscar</a>
+        <a href="#oraciones-panel" data-icon="gear" title="Oraciones" data-iconpos="notext">Oraciones</a>
+
+    </div><!-- /header -->
+
+
+    
+    <div role="main" class="ui-content jqm-content jqm-fullwidth" style="background-image: url(img/Logo_LTV_2014_peque.png); background-repeat:no-repeat; background-position: 85% 0%">
+    	          
+<a name="home">
+<!--<img style="float:right;margin-right:10px" src="img/Logo_LTV_2014_peque.png">-->
+</a>
+<br>
+<br>
+    	  <h2 >LuzEnTuVida.net <span id="working"><img src="img/working.gif">
+    	  <input name="workingPerc" id="workingPerc" type="text" value=""></span></h2>
+    	  <span title="Compartir" class="socialShare"> <!-- The share buttons will be inserted here --> </span>
+        <!--<p>A continuación las lecturas del día, y opciones para buscar las lecturas de otra fecha y para buscar en la Santa Biblia.</p>-->
+    	  
+    	  
+        
+
+		<!--<div data-demo-html="#panel-fixed-page1"></div>--><!--/demo-html -->
+
+<!--2015 -->
+<div data-role="content" class="ui-content" role="main">
+       <input type='hidden' id="Agno" name="Agno" >       
+
+       <input type='hidden' id="ciclo" name="ciclo" maxlength='20' size='20' >  
+       <input type='hidden' id="tipo" name="tipo" maxlength='20' size='20' >  
+       <input type='hidden' id="tiempo" name="color" maxlength='20' size='20' >  
+       <input type='hidden' id="semana" name="semana" maxlength='4' size='2' >       
+       <input type='hidden' id="dialit" name="dialit" maxlength='20' size='20' >  
+       <input type='hidden' id="color" name="color" maxlength='20' size='20' >  
+        
+                      <ul data-role="listview" data-inset="true" id="consoleListView"  data-theme='e'>        
+                        </ul>
+                      <ul style="text-align:justify;" data-role="listview" id="buscarListView"  data-theme='e'>        
+                        </ul>
+
+<!--php
+//fecha()
+
+/*		$diasem = fecha(true);
+echo "<p>Santo Rosario : ";
+		
+if (($diasem == 'Mon') || ($diasem == 'Sat')) {
+   echo '<a href="sqlbuscarwap.php?clavebus=site:3,1-1">Misterios Gozosos</a>';
+}
+if ($diasem == 'Thu') {
+   echo '<a href="sqlbuscarwap.php?clavebus=site:3,2-2">Misterios Luminosos</a>';
+}
+if (($diasem == 'Tue') || ($diasem == 'Fri')) {
+   echo '<a href="sqlbuscarwap.php?clavebus=site:3,3-3">Misterios Dolorosos</a>';
+}
+if (($diasem == 'Wed') || ($diasem == 'Sun')) {
+   echo '<a href="sqlbuscarwap.php?clavebus=site:3,4-4">Misterios Gloriosos</a>';
+}
+echo "</p>";
+*/
+
+     $lafecha = ($_POST['fechanueva'] == '' ? ($_POST['lafecha'] == '' ? date("Y-m-d") : $_POST['lafecha']) : $_POST['fechanueva'] ) ;
+     $anio = date ("Y");
+
+     $sqlsel = "select * from citas". $anio ." where fecha = '" . $lafecha . "' and estadoreg= 'A' " .
+				   " order by idreg";
+				   //echo $sqlsel;
+	   $res1 = mysql_query($sqlsel) or die(mysql_error());
+
+	   
+     $htmlAvanzadas  = "";
+     $htmlAvanzadas .= "<fieldset id='avanzadas' >";
+     $htmlAvanzadas .= "";
+     $htmlAvanzadas .= "<form method='post' action='index.php' id='formCitas' >";
+     $htmlAvanzadas .= "  <div style='padding:10px 20px' data-role='controlgroup' data-type='horizontal' data-mini='true'>";
+     //$htmlAvanzadas .= "    < ! - -  (año-mes-día) ? - - >";
+     $htmlAvanzadas .= "    <h3>Buscar Lecturas para la Fecha:</h3>";
+     $htmlAvanzadas .= "    <input title='aaaa-mm-dd' type='date' name=lafecha maxlength='10' size='11' value='" . $lafecha . "'>";
+     $htmlAvanzadas .= "    <input data-theme='c' align='center' id='cbioFecha' type=submit value='Enviar' >";
+     $htmlAvanzadas .= "  </div>";
+     $htmlAvanzadas .= "</form>";
+     $htmlAvanzadas .= "</fieldset>";
+
+	   //echo "       <b>Fecha (aaa-mm-dd):</b>";
+	   //echo "       <input title='aaaa-mm-dd' name=lafecha maxlength='10' size='11' value='" . $lafecha . "'>";
+	   //echo "</fieldset>";
+
+    $todasclaves = '';
+		while($row1 = mysql_fetch_array($res1)) {
+		      $clavebus = $row1['libro'] . ':' . $row1['capit'] . ',' . $row1['versini'] . '-' . $row1['versfin'];
+        $todasclaves = $todasclaves . $clavebus . "x1" ;
+         //     echo '<tr class=txtreginactivos><td colspan="6"><a href="sqlbuscarwap.php?clavebus=' . $clavebus . '">' . $clavebus . '</a></td></tr>';
+
+			   
+		}
+
+    if ( $todasclaves =="") {
+      $anio = $anio + 1;
+      $sqlsel = "select * from citas". $anio ." where fecha = '" . $lafecha . "' and estadoreg= 'A' " .
+               " order by idreg";
+               
+         $res1 = mysql_query($sqlsel) or die(mysql_error());
+
+        $todasclaves = '';
+        while($row1 = mysql_fetch_array($res1)) {
+              $clavebus = $row1['libro'] . ':' . $row1['capit'] . ',' . $row1['versini'] . '-' . $row1['versfin'];
+            $todasclaves = $todasclaves . $clavebus . "x1" ;
+             //     echo '<tr class=txtreginactivos><td colspan="6"><a href="sqlbuscarwap.php?clavebus=' . $clavebus . '">' . $clavebus . '</a></td></tr>';
+
+             
+        }
+    }
+
+    //echo "< ! - -" . $todasclaves . " - - >";
+    //list($clv1, $clv2, $clv3, $clv4, $clv5, $clv6)  = split("x1", $todasclaves, 6);
+    list($clv1, $clv2, $clv3, $clv4, $clv5, $clv6)  = explode("x1", $todasclaves, 6);
+-->
+
+<h3>Lecturas para el        <input type='text' id="lafecha" name="lafecha" maxlength='10' size='11' >       
+    <a id="btnCambiaFecha" href="#popupCambiaFecha" data-rel="popup" data-position-to="window"
+    class="ui-btn ui-corner-all ui-shadow ui-btn-inline  ui-icon-calendar ui-btn-icon-left ui-btn-a"
+    data-transition="pop">Mostrar para esa Fecha</a>
+</h3>
+    
+<!--      
+    for($i = 1; $i <=6; $i++) { 
+        $actual = "";
+        switch ($i) {
+            case 1:
+                $actual = $clv1;
+                break;
+            case 2:
+                $actual = $clv2;
+                break;
+            case 3:
+                $actual = $clv3;
+                break;
+            case 4:
+                $actual = $clv4;
+                break;
+            case 5:
+                $actual = $clv5;
+                break;
+            case 6:
+                $actual = $clv6;
+                break;
+        } 
+        
+        if($actual != "") {
+        
+           echo '       <div data-theme="d" data-role="collapsible" > ';
+           $lecturaActual = (substr($actual,0,2) == 'Mr' ? 'Del Santo Evangelio según San Marcos.' : 
+                               (substr($actual,0,2) == 'Mt' ? 'Del Santo Evangelio según San Mateo.' : 
+                               (substr($actual,0,2) == 'Lc' ? 'Del Santo Evangelio según San Lucas.' : 
+                               (substr($actual,0,2) == 'Jn' ? 'Del Santo Evangelio según San Juan.' : 
+                               (substr($actual,0,3) == 'Sal' ? 'Responsorial. ' : 'Lectura '
+                               )))));
+           echo '          <legend>' . $lecturaActual . '&nbsp;&nbsp;&nbsp;' .  $actual . '</legend>';
+           //echo '          <div data-role="controlgroup" data-type="vertical">';
+
+          $biblia = 'biblia';
+		        
+          $paso1 = explode(':', $actual);
+          $paso2 = explode(',', $paso1[1]);
+          $paso3 = explode('-', $paso2[1]);
+          
+          $libro = $paso1[0];
+          $capini = $paso2[0];
+          $capfin = $paso2[0];
+          $versini = $paso3[0];
+          $versfin = $paso3[1];
+
+          $sql = "SELECT idreg, orden, libro, capit, versini, versfin, titulo, contenido, estadoreg,media,audio from " . $biblia . " WHERE idreg > 0 " .
+                 ($libro == '' ? '' : " and libro = '" . $libro . "' ") .
+                 ($texto == '' ? '' : " and contenido like '%" . $texto . "%' ") .
+                 ($capfin == '' ? '' : " and (capit >= '" . $capini . "' and capit <= '" . $capfin . "') ") .
+                 ($versfin == '' ? '' : " and (versini >= '" . $versini . "' and versini <= '" . $versfin . "') ") .
+                 "order by orden limit 100";
+          $res = mysql_query($sql) or die(mysql_error() . "<br>SQL:<br>" . $sql);
+
+          $ImagenHoy = 'img/MyImgmis.jpg';
+          $Animacion = 'default';
+          $ellibro = '';
+          $currcap = '';
+          while($row = mysql_fetch_array($res)) {
+        
+               $resalte = $row['contenido'];
+               if(($row['capit'] <> $currcap) && (!$currcap=='') && ($row['libro'] != 'site')){
+                      echo '<h3>' . $row['libro'] . ':' . $row['capit'] . "</h3>";
+               } 
+               
+               //meter la imagen
+               if ( ($row['media'] == '') || (is_null($row['media'])) ) {
+                  $ImagenHoy = ($row['libro'] == 'Mr' ? 'Ilustra/sanmarcos.jpg' : 
+                               ($row['libro'] == 'Mt' ? 'Ilustra/sanmateo.jpg' : 
+                               ($row['libro'] == 'Lc' ? 'Ilustra/sanlucas.jpg' : 
+                               ($row['libro'] == 'Jn' ? 'Ilustra/sanjuan.jpg' : 'img/MyImgmis.jpg'
+                                ))));
+                  $Animacion = 'default';
+               } else {
+               
+                        
+                 $Animarray = explode('.',$ImagenHoy);
+                 if(!$Animarray == null) {
+                   $Animacion = $Animarray[0];
+                 }
+
+                 $ImagenHoy = '../Ilustra/' . $row['media'];
+                 echo  
+                    "<a target='image' href='" . 
+                    $ImagenHoy . "'><img class='ui-corner-bottom' style=';width:10%;heigth:10%;float:left;margin-top:20px;margin-right:10px' src='". $ImagenHoy . "' '></a>";
+
+               }
+               
+               
+               if(preg_match('/'.'<q[0-9]>'.'/i', $resalte)) {
+                  $resalte = preg_replace('/'.'(.*)<q1>(.*)</q1>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q2>(.*)</q2>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q3>(.*)</q3>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q4>(.*)</q4>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q5>(.*)</q5>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q6>(.*)</q6>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q7>(.*)</q7>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q8>(.*)</q8>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q9>(.*)</q9>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+                  $resalte = preg_replace('/'.'(.*)<q0>(.*)</q0>(.*)'.'/i', "\\1<a title=\"Ver\" class=\"linksuperpequeno\" href=\"/sqlbuscar-dot-php?clavebus=\\2\">\\2</a>\\3", $resalte);
+               }
+
+               if(preg_match('/'.'href'.'/i', $resalte)) {
+                  //nothing happens .. .
+                $resalte = $resalte . '<br>';
+               } else {
+                  //$resalte = preg_replace('/'.'([0-9]?[0-9])', '<br><strong>\\1</strong>', $resalte);
+                  if(preg_match('/'.'site'.'/i', $libro)) {
+                      $resalte = preg_replace('/'.'([0-9]?[0-9])'.'/i', '<br><strong>\\1</strong>', $resalte);
+                   }
+                  //not necessary $resalte = preg_replace('/'.'\\:'.'/i', '.<br>', $resalte);
+                  $resalte = preg_replace('/'.'_'.'/i', '<br>', $resalte);
+
+                         }
+                  $resalte = preg_replace('/'.'-dot-'.'/i', '.', $resalte);
+
+                  //2010 - break # and _ chars
+                  //$resalte = preg_replace('/'.'#'.'/i', '<br>', $resalte);
+                  $resalte = preg_replace('/'.'#'.'/i', ' ', $resalte);
+
+                  $lbesteverso = "(" . ($row['versini'] != $row['versfin'] ? $row['versini'] . '-' . $row['versfin'] : $row['versfin']) . ")";
+
+                  $lbaltverso = "(" . $row['libro'] . ':' . $row['capit'] . ',' . ($row['versini'] != $row['versfin'] ? $row['versini'] . '-' . $row['versfin'] : $row['versfin']) . ")";
+
+                  //$lkesteverso = "sqlbuscar.html?clavebus=" . $row['libro'] . ':' . $row['capit'] . ',' . $row['versini'] . '-' . $row['versfin'];
+                  //$lkesteverso = "";
+                  $lkesteverso = $row['libro'] . ':' . $row['capit'] . ',' . $row['versini'] . '-' . $row['versfin'];
+                  
+                //Extract links from titulo
+              
+                  if($row['titulo'] != '') {
+                      $nuevotit = $row['titulo'];
+                      $titenlaces = explode('@', $nuevotit);
+                      $nuevotit = $titenlaces[0];
+                      $relaclinks = "";
+                      foreach ( $titenlaces as $item ) {
+                          if($item != $nuevotit ) {
+                              $relaclinks .= '|| <a title="' . $item . 
+                                             '" class="linksuperpequeno" valign="top" href="#buscar" onclick="javascript:buscarCita(\'' . $item .
+                                             '\')";>' . $item . '</a>';
+                          }
+                      }
+                    
+                    //$nuevotit = preg_replace('/'.'\\@', '<a title=br>', $resalte);
+                    //echo '<p>';
+
+
+
+                   echo '<h4 >' . $nuevotit . ':' . $relaclinks . '</h4>';
+                                  
+                   //meter el audio
+                   if ($row['audio'] != '') {
+                      $myaudiofile1 = 'audio/' .   $row['audio'] ;
+                      $myaudiofile2 = preg_replace('/'.'mp3'.'/i', 'ogg', $myaudiofile1);
+                      echo "< ! - - Requested: " . $myaudiofile . " - - >";
+                      if (file_exists($myaudiofile1) || file_exists($myaudiofile2)) {
+                          echo "<audio controls>" .
+                          "HTML5 audio no está soportado en este Navegador, se recomienda un navegador moderno (Google Chrome, Mozilla Firefox, Opera, Safari)." . 
+                          "<source src='" . $myaudiofile1 . "'></source>" .
+                          "<source src='" . $myaudiofile2 . "'></source>" .
+                          "</audio><br><br>";
+                      }    
+                   }
+                   
+                  }      
+                  
+                  if(substr($lbesteverso,1,1) == '0' || substr($lbesteverso,1,1) == "-") {  
+                     echo $resalte . '';
+                  } else {
+                    // <a href="#" onclick="javascript:buscarCita(\'' . $clavebus . '\');">' . $clavebus . '</a>
+                    echo '<a title="' . $lbaltverso . '" '. 
+                          ' onclick="javascript:buscarCita(\'' . $lkesteverso . '\');" ' .
+                          ' class="linksuperpequeno" valign="top" href="#buscar">' . $lbesteverso . '</a> '
+                          . $resalte ;
+                  }
+
+               $ellibro = $row['libro'];
+               $currcap = $row['capit'];
+
+
+          }  //end while
+           //echo '<tr class=txtreginactivos><td colspan="6"><a href="sqlbuscarwap.php?clavebus=' . $clv1 . '&clavesig1=' . $clv2 .'&clavesig2=' . $clv3 .'">' . $clv1 . '</a></td></tr>';
+
+          echo '      </div> ';
+        }
+        
+        //echo '           </div> ';
+
+    }
+-->		
+              
+            </div>  
+ <br>
+    <div data-role="popup" id="popupCambiaFecha" data-theme="a" class="ui-corner-all">
+            <!--data-role="collapsible" -->
+            <!--php
+              echo $htmlAvanzadas;
+            -->
+    </div>
+
+
+
+	</div><!-- /content -->
+
+
+<br>
+    
+    <nav style="text-align:center">
+                <a href="#nav-panel">Buscador</a>&nbsp;&nbsp;
+                <a href="#oraciones-panel">Oraciones</a>&nbsp;&nbsp;
+                <a href="#listas-panel">Listas</a>&nbsp;&nbsp;
+                <a href="#contacto-panel">Contacto</a>
+    </nav>
+
+    <div data-role="footer" data-position="fixed" data-theme="a" style="text-align:center">
+    	<a data-role="button" data-inline="true"  onclick='openExternal("http://jumanja.net")'>(c) jumanja.net</a>
+    </div><!-- /footer -->
+
+	<div data-theme='d' data-role="panel" data-position-fixed="true" data-display="overlay" id="nav-panel">
+
+    <h4>Menú
+    <span style="float:right">
+         <a href="#" data-rel="close" title="Cerrar Panel"
+         class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline">Cerrar</a>
+    </span>
+    
+    </h4>
+    <hr>
+		<!--<ul data-role="listview">
+    <li data-icon="delete" >-->
+    <!--</li>
+<br>    
+<br>    
+		<ul data-role="listview">
+                <li><a href="#add-form">Oraciones</a></li>
+                <li><a href="#listas-panel">Listas</a></li>
+                <li><a href="#contacto-panel">Contacto</a></li>
+		</ul>-->
+    <ul style="text-align:left;list-style-type:none">
+                <li>&nbsp;&nbsp;&nbsp;<a href="#oraciones-panel">Oraciones</a></li>
+                <li>&nbsp;&nbsp;&nbsp;<a href="#listas-panel">Listas</a></li>
+                <li>&nbsp;&nbsp;&nbsp;<a href="#contacto-panel">Contacto</a></li>
+    </ul>
+<br>
+<h4>Buscador</h4>
+<hr>
+<!--inicio form buscar-->
+        <form method="post" action="sqlbuscar.html" id="formBuscar">
+            
+              <input type="hidden" id="myURL" value="<?php echo $_GET['myURL'];?>">
+            
+              <!--<label for="texto"><b>Buscar por Texto:</b></label>-->
+              <input data-mini="true" data-theme="a" type="search" name="texto" id="texto" placeholder="Palabra o frase a buscar...">
+
+          <fieldset data-role="collapsible" data-collapsed="false" id="buscaren">
+              <legend data-mini="true">Buscar en ... </legend>
+              
+                <select data-mini="true" name="libro" id="libro" align="left" data-placeholder="true">
+                    <option value="">Buscar en toda la Biblia</option>
+                    <option value="_sitio_LuzEnTuVida (site)">Buscar solo en el sitio LuzEnTuVida.net</option>
+                    <option value=""></option>
+                    <optgroup label="Evangelios" align="left">
+                      <option value="Jn">Juan (Jn)</option>
+                      <option value="Lc">Lucas (Lc)</option>
+                      <option value="Mr">Marcos (Mr)</option>
+                      <option value="Mt">Mateo (Mt)</option>
+                    </optgroup>
+                    <optgroup label="Libros">
+                    <option value="1 Co">1era Corintios (1 Co)</option><option value="1 Cr">1era Crónicas (1 Cr)</option><option value="1 Jn">1era Juan (1 Jn)</option><option value="1 M">1era Macabeos (1 M)</option><option value="1 P">1era Pedro (1 P)</option><option value="1 R">1era Reyes (1 R)</option><option value="1 S">1era Samuel (1 S)</option><option value="1 Ts">1era Tesalonicenses (1 Ts)</option><option value="1 Ti">1era Timoteo (1 Ti)</option><option value="2 Co">2da Corintios (2 Co)</option><option value="2 Cr">2da Crónicas (2 Cr)</option><option value="2 Jn">2da Juan (2 Jn)</option><option value="2 M">2da Macabeos (2 M)</option><option value="2 P">2da Pedro (2 P)</option><option value="2 R">2da Reyes (2 R)</option><option value="2 S">2da Samuel (2 S)</option><option value="2 Ts">2da Tesalonicenses (2 Ts)</option><option value="2 Ti">2da Timoteo (2 Ti)</option><option value="3 Jn">3era Juan (3 Jn)</option><option value="Abd">Abdías (Abd)</option><option value="Am">Amós (Am)</option><option value="Ap">Apocalipsis (Ap)</option><option value="Bar">Baruc (Bar)</option><option value="Cnt">Cantares (Cnt)</option><option value="Col">Colosenses (Col)</option><option value="OraRosario">Como Orar con el Santo Rosario (OraRosario)</option><option value="Dn">Daniel (Dn)</option><option value="DnDc">Daniel DC (DnDc)</option><option value="Dt">Deuteronomio (Dt)</option><option value="Ec">Eclesiastés (Ec)</option><option value="Sir">Eclesiástico o Siracida (Sir)</option><option value="Ef">Efesio (Ef)</option><option value="Esd">Esdras (Esd)</option><option value="Est">Ester (Est)</option><option value="Egr">Ester DC (Egr)</option><option value="Ex">Éxodo (Ex)</option><option value="Ez">Ezequiel (Ez)</option><option value="Flm">Filemón (Flm)</option><option value="Fil">Filipenses (Fil)</option><option value="Ga">Gálatas (Ga)</option><option value="Gn">Génesis (Gn)</option><option value="Hab">Habacuc (Hab)</option><option value="Hag">Hageo (Hag)</option><option value="He">Hebreos (He)</option><option value="Hch">Hechos (Hch)</option><option value="Is">Isaías (Is)</option><option value="Jer">Jeremías (Jer)</option><option value="Job">Job</option><option value="Jl">Joel (Jl)</option><option value="Jon">Jonás (Jon)</option><option value="Jos">Josué (Jos)</option><option value="Jn">Juan (Jn)</option><option value="Jud">Judas (Jud)</option><option value="Jdt">Judit (Jdt)</option><option value="Jue">Jueces (Jue)</option><option value="Lm">Lamentaciones (Lm)</option><option value="Lv">Levítico (Lv)</option><option value="Lc">Lucas (Lc)</option><option value="Mal">Malaquías (Mal)</option><option value="Mr">Marcos (Mr)</option><option value="Mt">Mateo (Mt)</option><option value="Mi">Miqueas (Mi)</option><option value="Nah">Nahúm (Nah)</option><option value="Neh">Nehemías (Neh)</option><option value="Nm">Números (Nm)</option><option value="Os">Oseas (Os)</option><option value="Pr">Proverbios (Pr)</option><option value="Ro">Romanos (Ro)</option><option value="Rt">Rut (Rt)</option><option value="Sab">Sabiduría (Sab)</option><option value="Sal">Salmos (Sal)</option><option value="Stg">Santiago (Stg)</option><option value="Sof">Sofonías (Sof)</option><option value="Tit">Tito (Tit)</option><option value="Tob">Tobit (Tob)</option><option value="Zac">Zacarías (Zac)</option><option value="site">_sitio_LuzEnTuVida (site)</option></select>                  
+                        
+                         <fieldset data-role="collapsible">
+                              <legend data-mini="true">Capítulos</legend>
+                             <!--onchange="$('#capfin').val(this.value);"-->
+                            <div data-role="controlgroup" data-type="horizontal">
+                                <select data-mini="true" name="capini" id="capini" onchange="javascript:changeCapFin();">
+                                  <option value="1">Ini.</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option><option>60</option><option>61</option><option>62</option><option>63</option><option>64</option><option>65</option><option>66</option><option>67</option><option>68</option><option>69</option><option>70</option><option>71</option><option>72</option><option>73</option><option>74</option><option>75</option><option>76</option><option>77</option><option>78</option><option>79</option><option>80</option><option>81</option><option>82</option><option>83</option><option>84</option><option>85</option><option>86</option><option>87</option><option>88</option><option>89</option><option>90</option><option>91</option><option>92</option><option>93</option><option>94</option><option>95</option><option>96</option><option>97</option><option>98</option><option>99</option><option>100</option><option>101</option><option>102</option><option>103</option><option>104</option><option>105</option><option>106</option><option>107</option><option>108</option><option>109</option><option>110</option><option>111</option><option>112</option><option>113</option><option>114</option><option>115</option><option>116</option><option>117</option><option>118</option><option>119</option><option>120</option><option>121</option><option>122</option><option>123</option><option>124</option><option>125</option><option>126</option><option>127</option><option>128</option><option>129</option><option>130</option><option>131</option><option>132</option><option>133</option><option>134</option><option>135</option><option>136</option><option>137</option><option>138</option><option>139</option><option>140</option><option>141</option><option>142</option><option>143</option><option>144</option><option>145</option><option>146</option><option>147</option><option>148</option><option>149</option><option>150</option><option>151</option><option>152</option><option>153</option><option>154</option><option>155</option><option>156</option><option>157</option><option>158</option><option>159</option><option>160</option><option>161</option><option>162</option><option>163</option><option>164</option><option>165</option><option>166</option><option>167</option><option>168</option><option>169</option><option>170</option><option>171</option><option>172</option><option>173</option><option>174</option><option>175</option><option>176</option><option>177</option><option>178</option><option>179</option><option>180</option><option>181</option><option>182</option><option>183</option><option>184</option><option>185</option><option>186</option><option>187</option><option>188</option><option>189</option><option>190</option><option>191</option><option>192</option><option>193</option><option>194</option><option>195</option><option>196</option><option>197</option><option>198</option><option>199</option><option>200</option>
+                                </select>
+                               <select data-mini="true" name="capfin" id="capfin"><option value="201">Fin.</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option><option>60</option><option>61</option><option>62</option><option>63</option><option>64</option><option>65</option><option>66</option><option>67</option><option>68</option><option>69</option><option>70</option><option>71</option><option>72</option><option>73</option><option>74</option><option>75</option><option>76</option><option>77</option><option>78</option><option>79</option><option>80</option><option>81</option><option>82</option><option>83</option><option>84</option><option>85</option><option>86</option><option>87</option><option>88</option><option>89</option><option>90</option><option>91</option><option>92</option><option>93</option><option>94</option><option>95</option><option>96</option><option>97</option><option>98</option><option>99</option><option>100</option><option>101</option><option>102</option><option>103</option><option>104</option><option>105</option><option>106</option><option>107</option><option>108</option><option>109</option><option>110</option><option>111</option><option>112</option><option>113</option><option>114</option><option>115</option><option>116</option><option>117</option><option>118</option><option>119</option><option>120</option><option>121</option><option>122</option><option>123</option><option>124</option><option>125</option><option>126</option><option>127</option><option>128</option><option>129</option><option>130</option><option>131</option><option>132</option><option>133</option><option>134</option><option>135</option><option>136</option><option>137</option><option>138</option><option>139</option><option>140</option><option>141</option><option>142</option><option>143</option><option>144</option><option>145</option><option>146</option><option>147</option><option>148</option><option>149</option><option>150</option><option>151</option><option>152</option><option>153</option><option>154</option><option>155</option><option>156</option><option>157</option><option>158</option><option>159</option><option>160</option><option>161</option><option>162</option><option>163</option><option>164</option><option>165</option><option>166</option><option>167</option><option>168</option><option>169</option><option>170</option><option>171</option><option>172</option><option>173</option><option>174</option><option>175</option><option>176</option><option>177</option><option>178</option><option>179</option><option>180</option><option>181</option><option>182</option><option>183</option><option>184</option><option>185</option><option>186</option><option>187</option><option>188</option><option>189</option><option>190</option><option>191</option><option>192</option><option>193</option><option>194</option><option>195</option><option>196</option><option>197</option><option>198</option><option>199</option><option>200</option>
+                               </select>
+                            </div>
+
+                             <!--<fieldset data-role="collapsible">-->
+                                  <legend data-mini="true">Versículos</legend>
+                                  <div data-mini="true" data-role="controlgroup" data-type="horizontal">
+                                    <select data-mini="true" name="versini" id="versini" onchange="javascript:changeVersFin();">
+                                      <option value="1">Ini.</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option><option>60</option><option>61</option><option>62</option><option>63</option><option>64</option><option>65</option><option>66</option><option>67</option><option>68</option><option>69</option><option>70</option><option>71</option><option>72</option><option>73</option><option>74</option><option>75</option><option>76</option><option>77</option><option>78</option><option>79</option><option>80</option><option>81</option><option>82</option><option>83</option><option>84</option><option>85</option><option>86</option><option>87</option><option>88</option><option>89</option><option>90</option><option>91</option><option>92</option><option>93</option><option>94</option><option>95</option><option>96</option><option>97</option><option>98</option><option>99</option><option>100</option><option>101</option><option>102</option><option>103</option><option>104</option><option>105</option><option>106</option><option>107</option><option>108</option><option>109</option><option>110</option><option>111</option><option>112</option><option>113</option><option>114</option><option>115</option><option>116</option><option>117</option><option>118</option><option>119</option><option>120</option><option>121</option><option>122</option><option>123</option><option>124</option><option>125</option><option>126</option><option>127</option><option>128</option><option>129</option><option>130</option><option>131</option><option>132</option><option>133</option><option>134</option><option>135</option><option>136</option><option>137</option><option>138</option><option>139</option><option>140</option><option>141</option><option>142</option><option>143</option><option>144</option><option>145</option><option>146</option><option>147</option><option>148</option><option>149</option><option>150</option><option>151</option><option>152</option><option>153</option><option>154</option><option>155</option><option>156</option><option>157</option><option>158</option><option>159</option><option>160</option><option>161</option><option>162</option><option>163</option><option>164</option><option>165</option><option>166</option><option>167</option><option>168</option><option>169</option><option>170</option><option>171</option><option>172</option><option>173</option><option>174</option><option>175</option><option>176</option><option>177</option><option>178</option><option>179</option><option>180</option><option>181</option><option>182</option><option>183</option><option>184</option><option>185</option><option>186</option><option>187</option><option>188</option><option>189</option><option>190</option><option>191</option><option>192</option><option>193</option><option>194</option><option>195</option><option>196</option><option>197</option><option>198</option><option>199</option><option>200</option>
+                                    </select><label for="verfin"></label>
+                                    <select data-mini="true" name="versfin" id="versfin"><option value="201">Fin.</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option><option>60</option><option>61</option><option>62</option><option>63</option><option>64</option><option>65</option><option>66</option><option>67</option><option>68</option><option>69</option><option>70</option><option>71</option><option>72</option><option>73</option><option>74</option><option>75</option><option>76</option><option>77</option><option>78</option><option>79</option><option>80</option><option>81</option><option>82</option><option>83</option><option>84</option><option>85</option><option>86</option><option>87</option><option>88</option><option>89</option><option>90</option><option>91</option><option>92</option><option>93</option><option>94</option><option>95</option><option>96</option><option>97</option><option>98</option><option>99</option><option>100</option><option>101</option><option>102</option><option>103</option><option>104</option><option>105</option><option>106</option><option>107</option><option>108</option><option>109</option><option>110</option><option>111</option><option>112</option><option>113</option><option>114</option><option>115</option><option>116</option><option>117</option><option>118</option><option>119</option><option>120</option><option>121</option><option>122</option><option>123</option><option>124</option><option>125</option><option>126</option><option>127</option><option>128</option><option>129</option><option>130</option><option>131</option><option>132</option><option>133</option><option>134</option><option>135</option><option>136</option><option>137</option><option>138</option><option>139</option><option>140</option><option>141</option><option>142</option><option>143</option><option>144</option><option>145</option><option>146</option><option>147</option><option>148</option><option>149</option><option>150</option><option>151</option><option>152</option><option>153</option><option>154</option><option>155</option><option>156</option><option>157</option><option>158</option><option>159</option><option>160</option><option>161</option><option>162</option><option>163</option><option>164</option><option>165</option><option>166</option><option>167</option><option>168</option><option>169</option><option>170</option><option>171</option><option>172</option><option>173</option><option>174</option><option>175</option><option>176</option><option>177</option><option>178</option><option>179</option><option>180</option><option>181</option><option>182</option><option>183</option><option>184</option><option>185</option><option>186</option><option>187</option><option>188</option><option>189</option><option>190</option><option>191</option><option>192</option><option>193</option><option>194</option><option>195</option><option>196</option><option>197</option><option>198</option><option>199</option><option>200</option>
+                                    </select>
+                                  </div>
+                             <!--</fieldset>-->
+                             
+                             <input data-mini="true" type="checkbox" checked name="muestraVer" id="muestraVer" value="1">
+                             <label data-mini="true" for="muestraVer">Muestra Versículo</label>
+
+                        </fieldset>
+                      <input type="submit" id="Find" data-inline="true" data-mini="true" data-rel="close" value="Enviar" data-theme='c'>
+                      <input type="reset" data-inline="true" data-mini="true" value="Limpiar" onclick="$('#buscarListView').html('');">
+
+                    </form> 
+
+<!--fin form buscar-->
+
+
+		<!--
+        	<br>
+        	<h2>Login</h2>
+        <form class="userform" >
+          
+
+            <label for="name">Username:</label>
+            <input type="text" name="name" id="name" value="" data-clear-btn="true" data-mini="true">
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" value="" data-clear-btn="true" autocomplete="off" data-mini="true">
+
+            <div class="ui-grid-a">
+                <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">Cancel</a></div>
+                <div class="ui-block-b"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">Save</a></div>
+			</div>
+        </form>
+-->
+	</div><!-- /panel -->
+
+	<div data-theme='c' data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" id="oraciones-panel">
+
+      <div data-role="content" >
+                <a href="#nav-panel">Buscador</a>&nbsp;&nbsp;
+                <a href="#listas-panel">Listas</a>&nbsp;&nbsp;
+                <a href="#contacto-panel">Contacto</a>
+                <hr>
+
+      <h2>Oraciones</h2>
+      <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Buscar Oración...">
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:2,1-2')";>Acto de Contrición</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,55-55')";>Acordaos (Memorare)</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,67-67')";>Alma de Cristo</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,16-16')";>Angel de mi Guarda</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,56-56')";>Angelus</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,66-66')";>Armadura del Cristiano</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,4-6')";>AveMaría</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,57-57')";>Bajo tu Amparo nos acogemos</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,58-58')";>Bendita sea tu Pureza</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,77-77')";>Comunión Espiritual</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,78-78')";>Consagración a María</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,79-79')";>Crucifijo de San Damián</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,11-14')";>Credo de los Apóstoles</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,19-20')";>Credo Niceno</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,7-8')";>Gloria</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,70-70')";>Gracias Padre</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,71-71')";>Gracias Señor</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,74-74')";>Himno al Espíritu Santo</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,9-9')";>Jesús, José y María</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,75-75')";>Letanías Lauretanas</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,25-26')";>Luego del Padre Nuestro</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,69-69')";>Magníficat</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,65-65')";>María Auxiliadora</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:3,3-3')";>Misterios Dolorosos</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:3,4-4')";>Misterios Gloriosos</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:3,1-1')";>Misterios Gozosos</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:3,2-2')";>Misterios Luminosos</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,68-68')";>Oración del Monaguillo (1)</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,82-82')";>Oración del Monaguillo (2)</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:4,1-1')";>Novena de la Confianza</a></li>
+<!--        <li><a href="#">Novena Navidad</a></li> -->
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,84-84')";>Oración de los Padres de Familia</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,27-29')";>Oración Comunión</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,23-24')";>Oración Elevación</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,21-22')";>Oración Ofrenda</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,30-33')";>Oración por la Paz</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,72-72')";>Oración por los Sacerdotes</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,73-73')";>Oración por las Vocaciones</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,83-83')";>Oración por las Vocaciones Franciscanas</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,1-3')";>Padre Nuestro</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,59-59')";>Sagrado Corazón de Jesús</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,15-15')";>Salve</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,81-81')";>San Antonio de Padua</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,64-64')";>San Gabriel Arcángel</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,76-76')";>San José</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,80-80')";>San Luis de Tolosa</a></li>        
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,62-62')";>San Miguel Arcángel</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,63-63')";>San Rafael Arcángel</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,60-60')";>Sangre de Cristo</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:3,1-8')";>Santo Rosario</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:8,61-61')";>Señal de la Cruz</a></li>
+        <li><a href="#buscar" onclick="javascript:buscarCita('site:1,17-17')";>Yo Pecador</a></li>        
+
+      </ul>
+      
+      </div>
+
+	</div><!-- /panel -->
+
+
+	<div data-theme='b' data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" id="listas-panel">
+
+      <div data-role="content">
+                <a href="#nav-panel">Buscador</a>&nbsp;&nbsp;
+                <a href="#oraciones-panel">Oraciones</a>&nbsp;&nbsp;
+                <a href="#contacto-panel">Contacto</a>
+                <hr>
+
+      <h2>Listas (Online)</h2>
+      <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Buscar Lista...">
+        <li><a target="lists" onclick='openExternal("http://luzentuvida.net/rosario/index.html")'>Orar el Santo Rosario</a></li>
+        <li><a target="lists" onclick='openExternal("http://luzentuvida.net/asis/index.html")'>Vida de San Francisco de Asís</a></li>
+        <li><a target="lists" onclick='openExternal("http://luzentuvida.net")'>Ver mas en LuzEntuvida.net</a></li>
+        <!--<li><a href="#buscar" onclick="javascript:buscarCita('site:8,55-55')";>Acordaos (Memorare)</a></li> -->
+
+      </ul>
+      </div>
+
+	</div><!-- /panel -->
+
+
+	<div data-theme='d' data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay"  id="contacto-panel">
+      <div data-role="content" >
+                <a href="#nav-panel">Buscador</a>&nbsp;&nbsp;
+                <a href="#oraciones-panel">Oraciones</a>&nbsp;&nbsp;
+                <a href="#listas-panel">Listas</a>
+                <hr>
+
+          <h2>Contacto</h2>
+                <div data-inset="true" data-role="content">
+                    <a href="mailto:jumanja@gmail.com" data-role="button" data-inline="true" data-icon="grid" data-mini="true">jumanja@gmail.com</a>
+                    <a href="http://www.jumanja.net" data-role="button" data-inline="true" data-icon="home" data-mini="true">www.jumanja.net</a>
+                    <br>Gracias a <a target="_blank" href="http://jquerymobile.com" data-role="button" data-inline="true" data-mini="true" data-iconpos="notext">jQuery Mobile</a>, 
+                    <a data-role="button" data-inline="true"  onclick='openExternal("http://luzentuvida.net")'>LuzEnTuVida.net</a> también se puede acceder desde dispositivos móviles. 
+                    <a target="_blank" href="http://jquerymobile.com/gbs/1.4/" data-role="button" data-inline="true" data-mini="true">Plataformas soportadas</a>
+
+                </div>
+                
+                
+
+      </div>
+
+	</div><!-- /panel -->
+
+
+
+</div><!-- /page -->
+
+<div data-role="page" id="panel-fixed-page2">
+
+    <div data-role="header">
+        <h1>Landing page</h1>
+        <a href="#panel-fixed-page1" data-icon="back" data-iconpos="notext">Buscar</a>
+        <a href="#nav-panel" data-icon="back" data-iconpos="notext">Menu</a>
+    </div><!-- /header -->
+
+    <div role="main" class="ui-content jqm-content">
+
+        <p>This is just a landing page.</p>
+
+        <a href="#panel-fixed-page1" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-mini ui-icon-back ui-btn-icon-left">Back</a>
+
+    </div><!-- /content -->
+
+</div><!-- /page -->
+   <script>
+        function changeCapFin() {
+            $("#capfin")[0].selectedIndex=$("#capini")[0].selectedIndex;
+            $("#capfin").selectmenu("refresh");
+        
+            //alert($('#capfin').selectedIndex);
+        }
+        
+        function changeVersFin() {
+            $('#versfin')[0].selectedIndex=$('#versini')[0].selectedIndex;
+            $('#versfin').selectmenu("refresh");
+        }
+        
+        function buscarOnSuccess(data, status)
+        {
+            //alert("buscarOnSuccess: Done");
+            data = $.trim(data);
+            //alert(data);
+            $("#buscarListView").html(data);
+            // a ver - $("#buscarListView").listview("refresh");
+            //$("#buscaren").trigger('collapse');
+            // setter
+            //$("#buscaren").collapsible( "option", "collapsed", true );
+            //$("#buscaren").listview("refresh");
+        }
+  
+        function buscarOnError(data, status)
+        {
+            // handle an error
+            //alert("Error:" + status);
+            //alert("buscarOnError: Done");
+        }        
+  
+        $(document).ready(function() {
+            $("#Find").click(function(){
+  
+                /*var formData = $("#formBuscar").serialize();
+                    //url: "runBuscar.php",
+  
+                //Show it is working
+                //$.mobile.navigate( "#buscar" );
+                //$.mobile.navigate( "#panel-fixed-page1" );
+
+                isWorking();
+                
+                $.ajax({
+                    type: "POST",
+                    url: "sqlbuscar.html",
+                    cache: false,
+                    data: formData,
+                    success: buscarOnSuccess,
+                    error: buscarOnError
+                });
+                */
+                var texto = $("#texto").val();
+                var libro = $("#libro").val();
+                var capini = $("#capini").val();
+                var capfin = $("#capfin").val();
+                var versini = $("#versini").val();
+                var versfin = $("#versfin").val();
+                var muestraver = $("#muestraVer").val();
+                
+                sqlBuscar(texto, libro, capini, capfin, versini, versfin, muestraver);
+                return false;
+            });
+            
+            $("#btnCambiaFecha").click(function(){
+                 
+                var today = new Date(document.getElementById("lafecha").value);
+
+                document.getElementById("Agno").value = today.getFullYear();
+                //document.getElementById("lafecha").value = getFormattedDate(today);
+  
+                Generar(4);
+                 
+                var lafecha = $("#lafecha").val();
+                var Agno = $("#Agno").val();
+                var ciclo = $("#ciclo").val();
+                var tipo = $("#tipo").val();
+                var tiempo = $("#tiempo").val();
+                var semana = $("#semana").val();
+                var dialit = $("#dialit").val();
+                var color = $("#color").val();
+
+                sqlFecha(lafecha, Agno, ciclo, tipo, tiempo, semana, dialit, color);
+                return false;
+            });
+        });
+        
+        function isWorking() {
+                //$("#avanzadas").attr("data-collapsed", "true");
+                $("#buscarListView").html("<b>Espere, Buscando...</b><img src='css/themes/images/ajax-loader.gif'>");
+        }
+        
+        function buscarCita(cita) {
+        
+                //$('#buscar').trigger('click');
+                
+                //Show it is working
+                isWorking();
+
+                /*$.ajax({
+                    type: "GET",
+                    url: "sqlbuscar.html",
+                    cache: true,
+                    data: { 
+                        clavebus: cita},
+                    success: buscarOnSuccess,
+                    error: buscarOnError
+                });*/
+                //sqlBuscar(cita);
+                sqlCita(cita, true, "Resultados Encontrados", "");  //clean and title
+        }
+        
+      //siempre se ejecuta    
+      /*var date = new Date();
+
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var year = date.getFullYear();
+
+      if (month < 10) month = "0" + month;
+      if (day < 10) day = "0" + day;
+
+      var today = year + "-" + month + "-" + day;  
+      document.getElementById('date').value = today;
+
+      buscarCitasHoy(today);*/
+      
+      //social
+      function handleSocialShare(myID)
+        {
+            $('#' + myID + ' option:selected').each(function()
+            {
+                text = "LuzEnTuVida.net";
+                url ="http://www.LuzEnTuVida.net";
+                var myURL = document.getElementById("myURL").value;
+                if(myURL != null) {
+                  if(myURL != '') {
+                    url = myURL;
+                  } 
+                }
+                //url = url + '?share=1';
+                
+                shareService = $(this).val()
+                switch (shareService) {
+                    case "facebook":
+                        shareFacebookLike(url);
+                        break;
+                    case "twitter":
+                        shareTwitter(url, text);
+                        break;
+                    case "email":
+                        shareEmail(url, text);
+                        break;
+                    default:
+
+                }
+            });
+        }
+
+      function shareFacebookLike(url)
+      {
+          window.open("http://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url), "face");
+      }
+      function shareTwitter(url, text)
+      {
+          window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(url), "twitter");
+      }
+
+      function shareEmail(body, subject)
+      {
+          window.open("mailto:?to=&subject=" + subject + "&body=" + body, "email");
+      }
+
+    </script>
+<!--
+    $cita = $_GET['cita'];
+    if($cita != '') {
+        //echo " cita no está en blanco: " . $cita;
+        echo "<script>buscarCita('" . $cita . "');</script>";
+    } else {
+        //echo " cita está en blanco";
+    }
+--?>
+	</body>
+
+</html>
